@@ -53,28 +53,37 @@
 
 #include <QGraphicsItem>
 
+#include <apf.h>
+
 class Node;
 
 //! [0]
 class Edge : public QGraphicsItem
 {
 public:
-    Edge(Node *sourceNode, Node *destNode);
+    Edge(apf::MeshEntity* me,
+         Node* sourceNode,
+         Node* destNode,
+         QList<Node*> &internalNodes);
 
     Node *sourceNode() const;
     Node *destNode() const;
+    QList<Node*>& internalNodes() const;
 
     void adjust();
 
-    enum { Type = UserType + 2 };
-    int type() const override { return Type; }
+    // enum { Type = UserType + 2 };
+    // int type() const override { return Type; }
 
 protected:
     QRectF boundingRect() const override;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
-    Node *source, *dest;
+    apf::MeshEntity* meshEdge;
+    Node* source;
+    Node* dest;
+    QList<Node*> internal;
 
     QPointF sourcePoint;
     QPointF destPoint;

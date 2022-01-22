@@ -55,8 +55,11 @@
 #include <QtMath>
 
 //! [0]
-Edge::Edge(Node *sourceNode, Node *destNode)
-    : source(sourceNode), dest(destNode)
+Edge::Edge(apf::MeshEntity* me,
+           Node* sourceNode,
+           Node* destNode,
+           QList<Node*>& internalNodes)
+    : meshEdge(me), source(sourceNode), dest(destNode), internal(internalNodes)
 {
     setAcceptedMouseButtons(Qt::NoButton);
     source->addEdge(this);
@@ -80,6 +83,8 @@ Node *Edge::destNode() const
 //! [2]
 void Edge::adjust()
 {
+    // instead of comming up with 2 pionts here, you come up with a list of point coordinates in the followin order
+    // v0 n0 n1 n2 ... v1
     if (!source || !dest)
         return;
 
@@ -90,7 +95,7 @@ void Edge::adjust()
 
     if (length > qreal(20.)) {
         QPointF edgeOffset((line.dx() * 10) / length, (line.dy() * 10) / length);
-        sourcePoint = line.p1() + edgeOffset;
+        sourcePoint = line.p1()  + edgeOffset;
         destPoint = line.p2() - edgeOffset;
     } else {
         sourcePoint = destPoint = line.p1();

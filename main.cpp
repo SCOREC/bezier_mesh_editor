@@ -54,18 +54,81 @@
 #include <QMainWindow>
 
 #include <PCU.h>
+#include <lionPrint.h>
+#include <apf.h>
+#include <apfMesh2.h>
+#include <apfMDS.h>
+#include <crv.h>
 
-#include "graphwidget.h"
+// #include <gmi.h>
+// #include <gmi_mesh.h>
+// #include <gmi_null.h>
+
+
+#include "meshwidget.h"
 
 int main(int argc, char **argv)
 {
+    MPI_Init(&argc,&argv);
+    PCU_Comm_Init();
+    lion_set_verbosity(1);
     QApplication app(argc, argv);
 
-    GraphWidget *widget = new GraphWidget;
+
+    apf::Mesh2* mesh = apf::makeEmptyMdsMesh(0, 1, false);
+
+    double vert_coords[2][6] = {
+        {0.,0.,0., 0., 0., 0.},
+        {100.,0.,0., 0., 0., 0.}
+    };
+
+    int edge_info[1][2] = {
+        {0,1}
+    };
+
+    apf::MeshEntity* verts[2];
+    apf::MeshEntity* edges[1];
+
+    for (int i = 0; i < 2; i++) {
+      apf::Vector3 coords(vert_coords[i][0],
+                          vert_coords[i][1],
+                          vert_coords[i][2]);
+      apf::Vector3 params(vert_coords[i][3],
+                          vert_coords[i][4],
+                          vert_coords[i][5]);
+      verts[i] = mesh->createVertex(0, coords, params);
+    }
+    for (int i = 0; i < 1; i++) {
+      apf::MeshEntity* down_vs[2] = {verts[edge_info[i][0]],
+                                     verts[edge_info[i][1]]};
+      edges[i] = mesh->createEntity(apf::Mesh::EDGE, 0, down_vs);
+    }
+
+    mesh->acceptChanges();
+
+    //  apf::changeMeshShape(mesh, crv::getBezier(3),true);
+    //  apf::FieldShape* fs = mesh->getShape();
+
+    // mesh->setPoint(edges[0], 0, apf::Vector3(0.33,  0.2, 0.));
+    // mesh->setPoint(edges[0], 1, apf::Vector3(0.67, -0.2, 0.));
+
+    // mesh->acceptChanges();
+    //  apf::writeVtkFiles("test_mesh", mesh);
+    crv::writeCurvedWireFrame(mesh, 10, "test_mesh_wire");
+
+    // mesh->destroyNative();
+    // apf::destroyMesh(mesh);
+
+
+    MeshWidget *widget = new MeshWidget(mesh);
 
     QMainWindow mainWindow;
     mainWindow.setCentralWidget(widget);
 
     mainWindow.show();
+
+
     return app.exec();
+    PCU_Comm_Free();
+    MPI_Finalize();
 }

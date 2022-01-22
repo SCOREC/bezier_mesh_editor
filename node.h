@@ -54,14 +54,18 @@
 #include <QGraphicsItem>
 #include <QList>
 
+#include <apf.h>
+
 class Edge;
-class GraphWidget;
+// class GraphWidget;
+class MeshWidget;
 
 //! [0]
 class Node : public QGraphicsItem
 {
 public:
-    Node(GraphWidget *graphWidget);
+    Node(MeshWidget *mesh,
+         apf::MeshEntity* v);
 
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
@@ -69,8 +73,8 @@ public:
     enum { Type = UserType + 1 };
     int type() const override { return Type; }
 
-    void calculateForces();
-    bool advancePosition();
+    // void calculateForces();
+    // bool advancePosition();
 
     QRectF boundingRect() const override;
     QPainterPath shape() const override;
@@ -82,11 +86,13 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
+    void updateMeshVert(const QPointF& pt);
+
 private:
     QList<Edge *> edgeList;
     QPointF newPos;
-    GraphWidget *graph;
+    MeshWidget *meshWidget;
+    apf::MeshEntity* meshVert;
 };
-//! [0]
 
 #endif // NODE_H
