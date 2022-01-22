@@ -29,10 +29,11 @@ find_package(Qt6 COMPONENTS Widgets)
 
 qt_add_executable(bezier_mesh_editor
     edge.cpp edge.h
-    graphwidget.cpp graphwidget.h
+    meshwidget.cpp meshwidget.h
     main.cpp
     node.cpp node.h
 )
+    #graphwidget.cpp graphwidget.h
 target_include_directories(bezier_mesh_editor PUBLIC
     $<BUILD_INTERFACE:/usr/include/x86_64-linux-gnu/mpich>)
 set_target_properties(bezier_mesh_editor PROPERTIES
