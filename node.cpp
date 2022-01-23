@@ -70,7 +70,7 @@ Node::Node(MeshWidget *mesh,
     setZValue(-1);
     apf::Vector3 p;
     meshWidget->getMesh()->getPoint(e, n, p);
-    setPos(p[0], p[1]);
+    setPos(p[0], -p[1]);
 }
 
 void Node::addEdge(Edge *edge)
@@ -204,6 +204,6 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void Node::updateMeshNode(const QPointF& pt)
 {
-    apf::Vector3 p(pt.x(), pt.y(), 0.);
+    apf::Vector3 p(pt.x(), -pt.y(), 0.);
     meshWidget->getMesh()->setPoint(ent, entNode, p);
 }
