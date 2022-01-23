@@ -63,12 +63,10 @@ class Edge : public QGraphicsItem
 public:
     Edge(apf::MeshEntity* me,
          Node* sourceNode,
-         Node* destNode,
-         QList<Node*> &internalNodes);
+         Node* destNode);
 
     Node *sourceNode() const;
     Node *destNode() const;
-    QList<Node*>& internalNodes() const;
 
     void adjust();
 
@@ -83,7 +81,6 @@ private:
     apf::MeshEntity* meshEdge;
     Node* source;
     Node* dest;
-    QList<Node*> internal;
 
     QPointF sourcePoint;
     QPointF destPoint;

@@ -106,11 +106,11 @@ int main(int argc, char **argv)
 
     mesh->acceptChanges();
 
-    //  apf::changeMeshShape(mesh, crv::getBezier(3),true);
-    //  apf::FieldShape* fs = mesh->getShape();
+    apf::changeMeshShape(mesh, crv::getBezier(3),true);
+    // apf::FieldShape* fs = mesh->getShape();
 
-    // mesh->setPoint(edges[0], 0, apf::Vector3(0.33,  0.2, 0.));
-    // mesh->setPoint(edges[0], 1, apf::Vector3(0.67, -0.2, 0.));
+    mesh->setPoint(edges[0], 0, apf::Vector3(33.,  20., 0.));
+    mesh->setPoint(edges[0], 1, apf::Vector3(67., -20., 0.));
 
     // mesh->acceptChanges();
     //  apf::writeVtkFiles("test_mesh", mesh);

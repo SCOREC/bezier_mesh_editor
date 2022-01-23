@@ -59,15 +59,17 @@
 #include <QDebug>
 
 Node::Node(MeshWidget *mesh,
-           apf::MeshEntity* v)
-    : meshWidget(mesh), meshVert(v)
+           apf::Mesh::Type t,
+           int n,
+           apf::MeshEntity* e)
+    : meshWidget(mesh), entType(t), entNode(n), ent(e)
 {
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);
     setZValue(-1);
     apf::Vector3 p;
-    meshWidget->getMesh()->getPoint(v, 0, p);
+    meshWidget->getMesh()->getPoint(e, n, p);
     setPos(p[0], p[1]);
 }
 
@@ -180,7 +182,7 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
         for (Edge *edge : qAsConst(edgeList))
             edge->adjust();
         //mesh_widget->itemMoved();
-        updateMeshVert(value.toPointF()); // pass a qfpoint made out of value
+        updateMeshNode(value.toPointF()); // pass a qfpoint made out of value
     default:
         break;
     };
@@ -200,8 +202,8 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsItem::mouseReleaseEvent(event);
 }
 
-void Node::updateMeshVert(const QPointF& pt)
+void Node::updateMeshNode(const QPointF& pt)
 {
     apf::Vector3 p(pt.x(), pt.y(), 0.);
-    meshWidget->getMesh()->setPoint(meshVert, 0, p);
+    meshWidget->getMesh()->setPoint(ent, entNode, p);
 }

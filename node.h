@@ -55,6 +55,7 @@
 #include <QList>
 
 #include <apf.h>
+#include <apfMesh.h>
 
 class Edge;
 // class GraphWidget;
@@ -65,7 +66,9 @@ class Node : public QGraphicsItem
 {
 public:
     Node(MeshWidget *mesh,
-         apf::MeshEntity* v);
+         apf::Mesh::Type t,
+         int n,
+         apf::MeshEntity* e);
 
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
@@ -86,13 +89,16 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event) override;
 
-    void updateMeshVert(const QPointF& pt);
+    void updateMeshNode(const QPointF& pt);
 
 private:
     QList<Edge *> edgeList;
     QPointF newPos;
     MeshWidget *meshWidget;
-    apf::MeshEntity* meshVert;
+
+    apf::Mesh::Type entType;
+    int entNode;
+    apf::MeshEntity* ent;
 };
 
 #endif // NODE_H

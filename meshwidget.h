@@ -5,6 +5,9 @@
 
 #include <apf.h>
 #include <apfMesh2.h>
+#include <apfNumbering.h>
+
+#include <crv.h>
 
 class Node;
 

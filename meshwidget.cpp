@@ -1,7 +1,5 @@
 #include <QKeyEvent>
 
-#include <crv.h>
-
 #include "meshwidget.h"
 #include "edge.h"
 #include "node.h"
@@ -19,33 +17,69 @@ MeshWidget::MeshWidget(apf::Mesh2* mesh, QWidget* parent)
     setTransformationAnchor(AnchorUnderMouse);
     scale(qreal(0.8), qreal(0.8));
     setMinimumSize(400, 400);
-    setWindowTitle(tr("Elastic Nodes"));
+    setWindowTitle(tr("Mesh Editor"));
+
+    apf::FieldShape* fs = m_mesh->getShape();
+    apf::Numbering* nodeIds = apf::createNumbering(m_mesh, "node_id", fs, 1);
+    int id = 0;
+    apf::MeshEntity* e;
+    apf::MeshIterator* it;
+    for (int d=0; d<=m_mesh->getDimension(); d++) {
+        if (!fs->hasNodesIn(d)) continue;
+        it = m_mesh->begin(d);
+        while ((e = m_mesh->iterate(it)))
+        {
+            int non = fs->countNodesOn(m_mesh->getType(e));
+            for (int n=0; n<non; n++) {
+                apf::number(nodeIds, e, n, 0, id);
+                id++;
+            }
+
+        }
+        m_mesh->end(it);
+    }
 
     QList<Node*> allNodes;
-    QList<Edge*> allEdges;
 
-    apf::MeshEntity* e;
-    apf::MeshIterator* it = m_mesh->begin(1);
+    // Add the (control net) Nodes
+    // They all can be added in a single loop (i.e., vert nodes, edge nodes and face nodes)
+    for (int d=0; d<=m_mesh->getDimension(); d++) {
+        if (!fs->hasNodesIn(d)) continue;
+        it = m_mesh->begin(d);
+        while ((e = m_mesh->iterate(it)))
+        {
+            apf::Mesh::Type mtype = m_mesh->getType(e);
+            int non = fs->countNodesOn(mtype);
+            for (int n=0; n<non; n++) {
+                Node* nd = new Node(this, mtype, n, e);
+                scene->addItem(nd);
+                allNodes.push_back(nd);
+            }
+        }
+        m_mesh->end(it);
+    }
 
+    // Add the (control net) Edges
+    // 1. Edges corresponding to mesh edges
+    it = m_mesh->begin(1);
     while ((e = m_mesh->iterate(it)))
     {
+        int non = fs->countNodesOn(m_mesh->getType(e));
+        QList<Node*> ns(non+2);
         apf::MeshEntity* vs[2];
         m_mesh->getDownward(e, 0, vs);
-        Node* ns[2];
-        ns[0] = new Node(this, vs[0]);
-        ns[1] = new Node(this, vs[1]);
-        allNodes.push_back(ns[0]);
-        allNodes.push_back(ns[1]);
-        QList<Node*> iNodes;
-        allEdges.push_back(new Edge(e, ns[0], ns[1], iNodes));
+        ns[0] = allNodes[apf::getNumber(nodeIds, vs[0], 0, 0)];
+        ns[non+2-1] = allNodes[apf::getNumber(nodeIds, vs[1], 0, 0)];
+        for (int n=0; n<non; n++) {
+            ns[n+1] = allNodes[apf::getNumber(nodeIds, e, n, 0)];
+        }
+
+        for (int n=0; n<non+1; n++) {
+            scene->addItem(new Edge(e, ns[n], ns[n+1]));
+        }
     }
     m_mesh->end(it);
-
-    for (int i = 0; i<allNodes.size() ; ++i)
-        scene->addItem(allNodes[i]);
-
-    for (int i = 0; i<allEdges.size() ; ++i)
-        scene->addItem(allEdges[i]);
+    // 2. Edges corresponding to mesh faces
 }
 
 
