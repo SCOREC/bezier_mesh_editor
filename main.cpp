@@ -51,14 +51,12 @@
 
 #include <QApplication>
 #include <QTime>
+#include <QDebug>
 #include <QMainWindow>
 
 #include <PCU.h>
 #include <lionPrint.h>
-#include <apf.h>
-#include <apfMesh2.h>
-#include <apfMDS.h>
-#include <crv.h>
+
 
 // #include <gmi.h>
 // #include <gmi_mesh.h>
@@ -66,6 +64,7 @@
 
 
 #include "meshwidget.h"
+#include "apfmesh.h"
 
 int main(int argc, char **argv)
 {
@@ -75,73 +74,10 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
 
 
-    apf::Mesh2* mesh = apf::makeEmptyMdsMesh(0, 2, false);
 
-    double vert_coords[4][6] = {
-        {0.,0.,0., 0., 0., 0.},
-        {100.,0.,0., 0., 0., 0.},
-        {0.,100.,0., 0., 0., 0.},
-        {100.,100.,0., 0., 0., 0.}
-    };
+    MeshWrapper* m = new ApfMesh();
 
-    // each edge is defined by the bounding verts
-    int edge_info[5][2] = {
-        {0,1},
-        {1,2},
-        {2,0},
-        {2,3},
-        {3,1}
-    };
-
-    // each face is defined by the bounding edges
-    int face_info[2][3] = {
-        {0,1,2},
-        {1,3,4}
-    };
-
-
-    apf::MeshEntity* verts[4];
-    apf::MeshEntity* edges[5];
-    apf::MeshEntity* faces[2];
-
-    for (int i = 0; i < 4; i++) {
-      apf::Vector3 coords(vert_coords[i][0],
-                          vert_coords[i][1],
-                          vert_coords[i][2]);
-      apf::Vector3 params(vert_coords[i][3],
-                          vert_coords[i][4],
-                          vert_coords[i][5]);
-      verts[i] = mesh->createVertex(0, coords, params);
-    }
-    for (int i = 0; i < 5; i++) {
-      apf::MeshEntity* down_vs[2] = {verts[edge_info[i][0]],
-                                     verts[edge_info[i][1]]};
-      edges[i] = mesh->createEntity(apf::Mesh::EDGE, 0, down_vs);
-    }
-    for (int i = 0; i < 2; i++) {
-      apf::MeshEntity* down_es[3] = {edges[face_info[i][0]],
-                                     edges[face_info[i][1]],
-                                     edges[face_info[i][2]]};
-      faces[i] = mesh->createEntity(apf::Mesh::TRIANGLE, 0, down_es);
-    }
-
-    mesh->acceptChanges();
-
-    apf::changeMeshShape(mesh, crv::getBezier(3),true);
-    // apf::FieldShape* fs = mesh->getShape();
-
-    // mesh->setPoint(edges[0], 0, apf::Vector3(33.,  20., 0.));
-    // mesh->setPoint(edges[0], 1, apf::Vector3(67., -20., 0.));
-
-    // mesh->acceptChanges();
-    //  apf::writeVtkFiles("test_mesh", mesh);
-    crv::writeCurvedWireFrame(mesh, 10, "test_mesh_wire");
-
-    // mesh->destroyNative();
-    // apf::destroyMesh(mesh);
-
-
-    MeshWidget *widget = new MeshWidget(mesh);
+    MeshWidget *widget = new MeshWidget(m);
 
     QMainWindow mainWindow;
     mainWindow.setCentralWidget(widget);
@@ -150,6 +86,8 @@ int main(int argc, char **argv)
 
 
     return app.exec();
+    delete m;
+
     PCU_Comm_Free();
     MPI_Finalize();
 }

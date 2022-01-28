@@ -54,21 +54,24 @@
 #include <QGraphicsItem>
 #include <QList>
 
-#include <apf.h>
-#include <apfMesh.h>
+#include "meshwrapper.h"
+
+// class MeshWrapper;
+
+
 
 class Edge;
 // class GraphWidget;
-class MeshWidget;
+// class MeshWidget;
 
 //! [0]
 class Node : public QGraphicsItem
 {
 public:
-    Node(MeshWidget *mesh,
-         apf::Mesh::Type t,
+    Node(MeshWrapper* m,
+         EntPtr e,
          int n,
-         apf::MeshEntity* e);
+         int d);
 
     void addEdge(Edge *edge);
     QList<Edge *> edges() const;
@@ -94,11 +97,10 @@ protected:
 private:
     QList<Edge *> edgeList;
     QPointF newPos;
-    MeshWidget *meshWidget;
-
-    apf::Mesh::Type entType;
-    int entNode;
-    apf::MeshEntity* ent;
+    MeshWrapper *mesh;
+    EntPtr ent;
+    int node;
+    int dim;
 };
 
 #endif // NODE_H

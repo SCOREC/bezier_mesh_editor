@@ -3,11 +3,8 @@
 
 #include <QGraphicsView>
 
-#include <apf.h>
-#include <apfMesh2.h>
-#include <apfNumbering.h>
+#include <meshwrapper.h>
 
-#include <crv.h>
 
 class Node;
 
@@ -15,7 +12,7 @@ class MeshWidget : public QGraphicsView
 {
     Q_OBJECT
 public:
-    MeshWidget(apf::Mesh2* mesh, QWidget *parent = nullptr);
+    MeshWidget(MeshWrapper* m, QWidget *parent = nullptr);
 
     void itemMoved();
 
@@ -23,7 +20,7 @@ public slots:
     // void shuffle();
     void zoomIn();
     void zoomOut();
-    apf::Mesh2* getMesh() {return m_mesh;}
+    MeshWrapper* getMesh() {return mesh;}
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;
@@ -36,8 +33,7 @@ protected:
 
 private:
 
-    apf::Mesh2* m_mesh;
-    Node *centerNode;
+    MeshWrapper* mesh;
 };
 
 #endif // MESHWIDGET_H

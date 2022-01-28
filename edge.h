@@ -53,7 +53,7 @@
 
 #include <QGraphicsItem>
 
-#include <apf.h>
+#include "meshwrapper.h"
 
 class Node;
 
@@ -61,7 +61,7 @@ class Node;
 class Edge : public QGraphicsItem
 {
 public:
-    Edge(apf::MeshEntity* me,
+    Edge(EntPtr e,
          Node* sourceNode,
          Node* destNode);
 
@@ -78,7 +78,7 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
-    apf::MeshEntity* meshEnt;
+    EntPtr ent;
     Node* source;
     Node* dest;
 

@@ -28,10 +28,12 @@ find_package(Qt6 COMPONENTS Gui)
 find_package(Qt6 COMPONENTS Widgets)
 
 qt_add_executable(bezier_mesh_editor
+    node.cpp node.h
     edge.cpp edge.h
+    meshwrapper.cpp meshwrapper.h
+    apfmesh.cpp apfmesh.h
     meshwidget.cpp meshwidget.h
     main.cpp
-    node.cpp node.h
 )
     #graphwidget.cpp graphwidget.h
 target_include_directories(bezier_mesh_editor PUBLIC

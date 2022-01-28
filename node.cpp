@@ -50,7 +50,7 @@
 
 #include "edge.h"
 #include "node.h"
-#include "meshwidget.h"
+#include "meshwrapper.h"
 
 #include <QGraphicsScene>
 #include <QGraphicsSceneMouseEvent>
@@ -58,19 +58,21 @@
 #include <QStyleOption>
 #include <QDebug>
 
-Node::Node(MeshWidget *mesh,
-           apf::Mesh::Type t,
-           int n,
-           apf::MeshEntity* e)
-    : meshWidget(mesh), entType(t), entNode(n), ent(e)
+
+
+Node::Node(MeshWrapper* m,
+           EntPtr e, // pointer to the mesh entity this node is a part of
+           int n,    // this nodes numbert wrt e
+           int d)    // the dimentions of e
+    : mesh(m), ent(e), node(n), dim(d)
 {
     setFlag(ItemIsMovable);
     setFlag(ItemSendsGeometryChanges);
     setCacheMode(DeviceCoordinateCache);
     setZValue(-1);
-    apf::Vector3 p;
-    meshWidget->getMesh()->getPoint(e, n, p);
-    setPos(p[0], -p[1]);
+
+    QPointF p = mesh->getNodePosition(ent, node);
+    setPos(p.x(), -p.y());
 }
 
 void Node::addEdge(Edge *edge)
@@ -166,16 +168,16 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         gradient.setColorAt(1, QColor(Qt::yellow).lighter(120));
         gradient.setColorAt(0, QColor(Qt::darkYellow).lighter(120));
     } else {
-        switch (entType) {
-        case apf::Mesh::VERTEX:
+        switch (dim) {
+        case 0:
             gradient.setColorAt(0, Qt::yellow);
             gradient.setColorAt(1, Qt::darkYellow);
             break;
-        case apf::Mesh::EDGE:
+        case 1:
             gradient.setColorAt(0, Qt::green);
             gradient.setColorAt(1, Qt::darkGreen);
             break;
-        case apf::Mesh::TRIANGLE:
+        case 2:
             gradient.setColorAt(0, Qt::red);
             gradient.setColorAt(1, Qt::darkRed);
             break;
@@ -218,6 +220,6 @@ void Node::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void Node::updateMeshNode(const QPointF& pt)
 {
-    apf::Vector3 p(pt.x(), -pt.y(), 0.);
-    meshWidget->getMesh()->setPoint(ent, entNode, p);
+    QPointF p(pt.x(), -pt.y());
+    mesh->setNodePosition(ent, node, p);
 }
