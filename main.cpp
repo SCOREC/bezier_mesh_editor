@@ -75,21 +75,36 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
 
 
-    apf::Mesh2* mesh = apf::makeEmptyMdsMesh(0, 1, false);
+    apf::Mesh2* mesh = apf::makeEmptyMdsMesh(0, 2, false);
 
-    double vert_coords[2][6] = {
+    double vert_coords[4][6] = {
         {0.,0.,0., 0., 0., 0.},
-        {100.,0.,0., 0., 0., 0.}
+        {100.,0.,0., 0., 0., 0.},
+        {0.,100.,0., 0., 0., 0.},
+        {100.,100.,0., 0., 0., 0.}
     };
 
-    int edge_info[1][2] = {
-        {0,1}
+    // each edge is defined by the bounding verts
+    int edge_info[5][2] = {
+        {0,1},
+        {1,2},
+        {2,0},
+        {2,3},
+        {3,1}
     };
 
-    apf::MeshEntity* verts[2];
-    apf::MeshEntity* edges[1];
+    // each face is defined by the bounding edges
+    int face_info[2][3] = {
+        {0,1,2},
+        {1,3,4}
+    };
 
-    for (int i = 0; i < 2; i++) {
+
+    apf::MeshEntity* verts[4];
+    apf::MeshEntity* edges[5];
+    apf::MeshEntity* faces[2];
+
+    for (int i = 0; i < 4; i++) {
       apf::Vector3 coords(vert_coords[i][0],
                           vert_coords[i][1],
                           vert_coords[i][2]);
@@ -98,10 +113,16 @@ int main(int argc, char **argv)
                           vert_coords[i][5]);
       verts[i] = mesh->createVertex(0, coords, params);
     }
-    for (int i = 0; i < 1; i++) {
+    for (int i = 0; i < 5; i++) {
       apf::MeshEntity* down_vs[2] = {verts[edge_info[i][0]],
                                      verts[edge_info[i][1]]};
       edges[i] = mesh->createEntity(apf::Mesh::EDGE, 0, down_vs);
+    }
+    for (int i = 0; i < 2; i++) {
+      apf::MeshEntity* down_es[3] = {edges[face_info[i][0]],
+                                     edges[face_info[i][1]],
+                                     edges[face_info[i][2]]};
+      faces[i] = mesh->createEntity(apf::Mesh::TRIANGLE, 0, down_es);
     }
 
     mesh->acceptChanges();
@@ -109,8 +130,8 @@ int main(int argc, char **argv)
     apf::changeMeshShape(mesh, crv::getBezier(3),true);
     // apf::FieldShape* fs = mesh->getShape();
 
-    mesh->setPoint(edges[0], 0, apf::Vector3(33.,  20., 0.));
-    mesh->setPoint(edges[0], 1, apf::Vector3(67., -20., 0.));
+    // mesh->setPoint(edges[0], 0, apf::Vector3(33.,  20., 0.));
+    // mesh->setPoint(edges[0], 1, apf::Vector3(67., -20., 0.));
 
     // mesh->acceptChanges();
     //  apf::writeVtkFiles("test_mesh", mesh);

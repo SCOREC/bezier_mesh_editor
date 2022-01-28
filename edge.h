@@ -78,7 +78,7 @@ protected:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget) override;
 
 private:
-    apf::MeshEntity* meshEdge;
+    apf::MeshEntity* meshEnt;
     Node* source;
     Node* dest;
 

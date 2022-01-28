@@ -58,7 +58,7 @@
 Edge::Edge(apf::MeshEntity* me,
            Node* sourceNode,
            Node* destNode)
-    : meshEdge(me), source(sourceNode), dest(destNode)
+    : meshEnt(me), source(sourceNode), dest(destNode)
 {
     setAcceptedMouseButtons(Qt::NoButton);
     source->addEdge(this);

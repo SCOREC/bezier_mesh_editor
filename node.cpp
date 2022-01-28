@@ -166,8 +166,22 @@ void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWid
         gradient.setColorAt(1, QColor(Qt::yellow).lighter(120));
         gradient.setColorAt(0, QColor(Qt::darkYellow).lighter(120));
     } else {
-        gradient.setColorAt(0, Qt::yellow);
-        gradient.setColorAt(1, Qt::darkYellow);
+        switch (entType) {
+        case apf::Mesh::VERTEX:
+            gradient.setColorAt(0, Qt::yellow);
+            gradient.setColorAt(1, Qt::darkYellow);
+            break;
+        case apf::Mesh::EDGE:
+            gradient.setColorAt(0, Qt::green);
+            gradient.setColorAt(1, Qt::darkGreen);
+            break;
+        case apf::Mesh::TRIANGLE:
+            gradient.setColorAt(0, Qt::red);
+            gradient.setColorAt(1, Qt::darkRed);
+            break;
+        default:
+            break;
+        }
     }
     painter->setBrush(gradient);
 

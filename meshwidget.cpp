@@ -4,6 +4,69 @@
 #include "edge.h"
 #include "node.h"
 
+static void reordreData(
+    int const dataIn[],
+    int dataOut[],
+    int const order[],
+    int n)
+{
+  for (int i = 0; i < n; i++)
+    dataOut[order[i]] = dataIn[i];
+}
+
+static void getNodeIds(apf::Numbering* n, apf::MeshEntity* e, apf::NewArray<int>& ids)
+{
+  apf::Mesh* m = apf::getMesh(n);
+  int etype = m->getType(e);
+  int edim = apf::Mesh::typeDimension[etype];
+  apf::FieldShape* fs = apf::getShape(n);
+  apf::EntityShape* es = fs->getEntityShape(etype);
+  int nen = es->countNodes(); // total nodes
+
+  apf::DynamicArray<int> order;
+  apf::DynamicArray<int> data;
+
+  ids.allocate(nen);
+
+  int s = 0;
+  for (int d = 0; d <= edim; d++){
+    if (!fs->hasNodesIn(d)) continue;
+    apf::Downward a;
+    int na = m->getDownward(e, d, a);
+    for (int i = 0; i < na; i++)
+    {
+      int nan = fs->countNodesOn(m->getType(a[i]));
+      order.setSize(nan);
+      data.setSize(nan);
+      for (int j = 0; j < nan; j++)
+        data[j] = apf::getNumber(n, a[i], j, 0);
+      if (nan > 1 && edim !=d)
+      {
+        es->alignSharedNodes(m, e, a[i], &order[0]);
+        reordreData(&data[0], &ids[s], &order[0], nan);
+      }
+      else if(nan)
+      {
+        for (int j = 0; j < nan; j++)
+          ids[s+j] = data[j];
+      }
+      s += nan;
+    }
+  }
+}
+
+static int computeTriNodeIndex(int P, int i, int j)
+{
+  int k = P-i-j;
+  if(i == P) return 0;
+  if(j == P) return 1;
+  if(k == P) return 2;
+  if(k == 0) return 2+j; // 0-1
+  if(i == 0) return 2+(P-1)+k; // 1-2
+  if(j == 0) return 2+(P-1)*2+i; // 2-0
+  return k*(P-1)-k*(k-1)/2+j+2*P;
+}
+
 MeshWidget::MeshWidget(apf::Mesh2* mesh, QWidget* parent)
     : m_mesh(mesh), QGraphicsView(parent)
 {
@@ -80,6 +143,31 @@ MeshWidget::MeshWidget(apf::Mesh2* mesh, QWidget* parent)
     }
     m_mesh->end(it);
     // 2. Edges corresponding to mesh faces
+    int P = m_mesh->getShape()->getOrder();
+    it = m_mesh->begin(2);
+    while ((e = m_mesh->iterate(it)))
+    {
+        apf::NewArray<int> ids;
+        getNodeIds(nodeIds, e, ids);
+        for (int k=1; k<P; k++)
+            for (int i=P-k-1; i>=0; i--)
+            {
+                int j = P-i-k;
+                printf("node C_%d,%d,%d\n", i, j, k);
+                int currentNodeIndex = ids[computeTriNodeIndex(P,i,j)];
+                int    leftNodeIndex = ids[computeTriNodeIndex(P,i+1,j-1)];
+                int    downNodeIndex = ids[computeTriNodeIndex(P,i+1,j)];
+
+                Node* currentNode = allNodes[currentNodeIndex];
+                Node*    leftNode = allNodes[leftNodeIndex];
+                Node*    downNode = allNodes[downNodeIndex];
+                scene->addItem(new Edge(e, leftNode, currentNode));
+                scene->addItem(new Edge(e, currentNode, downNode));
+                scene->addItem(new Edge(e, leftNode, downNode));
+            }
+    }
+    m_mesh->end(it);
+
 }
 
 
@@ -105,7 +193,8 @@ void MeshWidget::keyPressEvent(QKeyEvent *event)
         zoomOut();
         break;
     case Qt::Key_Space:
-        crv::writeCurvedWireFrame(m_mesh, 10, "changed_mesh_wire");
+        crv::writeCurvedVtuFiles(m_mesh, apf::Mesh::TRIANGLE, 5, "changed_mesh");
+        crv::writeCurvedWireFrame(m_mesh, 10, "changed_mesh");
         break;
     case Qt::Key_Enter:
     default:
