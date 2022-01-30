@@ -6,8 +6,8 @@
 #include "node.h"
 
 
-MeshWidget::MeshWidget(MeshWrapper* m, QWidget* parent)
-    : mesh(m), QGraphicsView(parent)
+MeshWidget::MeshWidget(MeshWrapper* m, qreal psize, qreal lwidth, QWidget* parent)
+    : mesh(m), pointSize(psize), lineWidth(lwidth), QGraphicsView(parent)
 {
     QGraphicsScene *scene = new QGraphicsScene(this);
     scene->setItemIndexMethod(QGraphicsScene::NoIndex);
@@ -26,10 +26,23 @@ MeshWidget::MeshWidget(MeshWrapper* m, QWidget* parent)
     qInfo() << "calling getAllEdges";
     QList<Edge*> allEdges = mesh->getAllEdges();
     qInfo() << "adding nodes and edges to the scene";
+    int cnt = 0;
     for(auto n : allNodes)
+    {
+        // set the gometric properies of the nodes (e.g., radius, etc)
+        n->setSize(pointSize);
         scene->addItem(n);
+        cnt++;
+    }
     for(auto e : allEdges)
+    {
+        // set the geometric properites of the edges (e.g., width, etc)
+        e->setWidth(lineWidth);
+        // the follwoing is needed here since when nodes are created geometric properies
+        // of the nodes (e.g., raduis) are not set
+        e->adjust();
         scene->addItem(e);
+    }
 }
 
 

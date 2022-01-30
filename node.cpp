@@ -73,6 +73,7 @@ Node::Node(MeshWrapper* m,
 
     QPointF p = mesh->getNodePosition(ent, node);
     setPos(p.x(), -p.y());
+    // setSize(1.);
 }
 
 void Node::addEdge(Edge *edge)
@@ -86,109 +87,87 @@ QList<Edge *> Node::edges() const
     return edgeList;
 }
 
-// void Node::calculateForces()
-// {
-    // if (!scene() || scene()->mouseGrabberItem() == this) {
-        // newPos = pos();
-        // return;
-    // }
-
-    // // Sum up all forces pushing this item away
-    // qreal xvel = 0;
-    // qreal yvel = 0;
-    // const QList<QGraphicsItem *> items = scene()->items();
-    // for (QGraphicsItem *item : items) {
-        // Node *node = qgraphicsitem_cast<Node *>(item);
-        // if (!node)
-            // continue;
-
-        // QPointF vec = mapToItem(node, 0, 0);
-        // qreal dx = vec.x();
-        // qreal dy = vec.y();
-        // double l = 2.0 * (dx * dx + dy * dy);
-        // if (l > 0) {
-            // xvel += (dx * 150.0) / l;
-            // yvel += (dy * 150.0) / l;
-        // }
-    // }
-
-    // // Now subtract all forces pulling items together
-    // double weight = (edgeList.size() + 1) * 10;
-    // for (const Edge *edge : qAsConst(edgeList)) {
-        // QPointF vec;
-        // if (edge->sourceNode() == this)
-            // vec = mapToItem(edge->destNode(), 0, 0);
-        // else
-            // vec = mapToItem(edge->sourceNode(), 0, 0);
-        // xvel -= vec.x() / weight;
-        // yvel -= vec.y() / weight;
-    // }
-
-    // if (qAbs(xvel) < 0.1 && qAbs(yvel) < 0.1)
-        // xvel = yvel = 0;
-
-    // QRectF sceneRect = scene()->sceneRect();
-    // newPos = pos() + QPointF(xvel, yvel);
-    // newPos.setX(qMin(qMax(newPos.x(), sceneRect.left() + 10), sceneRect.right() - 10));
-    // newPos.setY(qMin(qMax(newPos.y(), sceneRect.top() + 10), sceneRect.bottom() - 10));
-// }
-
-// bool Node::advancePosition()
-// {
-    // if (newPos == pos())
-        // return false;
-
-    // setPos(newPos);
-    // return true;
-// }
-
 QRectF Node::boundingRect() const
 {
-    qreal adjust = 2;
-    return QRectF( -10 - adjust, -10 - adjust, 23 + adjust, 23 + adjust);
+    qreal adjust = 1;
+    return QRectF( -pointSize - adjust, -pointSize - adjust, 2*pointSize + adjust, 2*pointSize + adjust);
 }
 
 QPainterPath Node::shape() const
 {
     QPainterPath path;
-    path.addEllipse(-10, -10, 20, 20);
+    path.addEllipse(-pointSize, -pointSize, 2*pointSize, 2*pointSize);
     return path;
 }
 
 void Node::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *)
 {
-    painter->setPen(Qt::NoPen);
-    painter->setBrush(Qt::darkGray);
-    painter->drawEllipse(-7, -7, 20, 20);
+    // Shadow
+    ///////////////////////////////////////////////
+    // painter->setPen(Qt::NoPen);
+    // painter->setBrush(Qt::darkGray);
+    // painter->drawEllipse(-7, -7, 20, 20);
 
-    QRadialGradient gradient(-3, -3, 10);
-    if (option->state & QStyle::State_Sunken) {
-        gradient.setCenter(3, 3);
-        gradient.setFocalPoint(3, 3);
-        gradient.setColorAt(1, QColor(Qt::yellow).lighter(120));
-        gradient.setColorAt(0, QColor(Qt::darkYellow).lighter(120));
-    } else {
-        switch (dim) {
-        case 0:
-            gradient.setColorAt(0, Qt::yellow);
-            gradient.setColorAt(1, Qt::darkYellow);
-            break;
-        case 1:
-            gradient.setColorAt(0, Qt::green);
-            gradient.setColorAt(1, Qt::darkGreen);
-            break;
-        case 2:
-            gradient.setColorAt(0, Qt::red);
-            gradient.setColorAt(1, Qt::darkRed);
-            break;
-        default:
-            break;
-        }
+    // Gradient
+    ///////////////////////////////////////////////
+    // QRadialGradient gradient(-3, -3, 10);
+    // if (option->state & QStyle::State_Sunken) {
+        // gradient.setCenter(3, 3);
+        // gradient.setFocalPoint(3, 3);
+        // switch (dim) {
+        // case 0:
+            // gradient.setColorAt(1, QColor(Qt::yellow).lighter(120));
+            // gradient.setColorAt(0, QColor(Qt::darkYellow).lighter(120));
+            // break;
+        // case 1:
+            // gradient.setColorAt(1, QColor(Qt::green).lighter(120));
+            // gradient.setColorAt(0, QColor(Qt::darkGreen).lighter(120));
+            // break;
+        // case 2:
+            // gradient.setColorAt(1, QColor(Qt::red).lighter(120));
+            // gradient.setColorAt(0, QColor(Qt::darkRed).lighter(120));
+            // break;
+        // default:
+            // break;
+        // }
+    // } else {
+        // switch (dim) {
+        // case 0:
+            // gradient.setColorAt(0, Qt::yellow);
+            // gradient.setColorAt(1, Qt::darkYellow);
+            // break;
+        // case 1:
+            // gradient.setColorAt(0, Qt::green);
+            // gradient.setColorAt(1, Qt::darkGreen);
+            // break;
+        // case 2:
+            // gradient.setColorAt(0, Qt::red);
+            // gradient.setColorAt(1, Qt::darkRed);
+            // break;
+        // default:
+            // break;
+        // }
+    // }
+    // painter->setBrush(gradient);
+
+    switch (dim) {
+    case 0:
+        painter->setBrush(Qt::yellow);
+        break;
+    case 1:
+        painter->setBrush(Qt::green);
+        break;
+    case 2:
+        painter->setBrush(Qt::red);
+        break;
+    default:
+        break;
     }
-    painter->setBrush(gradient);
+
 
     painter->setPen(QPen(Qt::black, 0));
-    painter->drawEllipse(-10, -10, 20, 20);
+    // painter->drawEllipse(-10, -10, 20, 20);
+    painter->drawEllipse(-pointSize, -pointSize, 2*pointSize, 2*pointSize);
 }
 
 QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)

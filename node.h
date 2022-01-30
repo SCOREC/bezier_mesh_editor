@@ -79,6 +79,8 @@ public:
     enum { Type = UserType + 1 };
     int type() const override { return Type; }
 
+    void setSize(qreal s) {  pointSize = s; }
+    qreal getSize() { return pointSize; }
     // void calculateForces();
     // bool advancePosition();
 
@@ -101,6 +103,7 @@ private:
     EntPtr ent;
     int node;
     int dim;
+    qreal pointSize;
 };
 
 #endif // NODE_H

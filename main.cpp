@@ -77,7 +77,7 @@ int main(int argc, char **argv)
 
     MeshWrapper* m = new ApfMesh();
 
-    MeshWidget *widget = new MeshWidget(m);
+    MeshWidget *widget = new MeshWidget(m,2.);
 
     QMainWindow mainWindow;
     mainWindow.setCentralWidget(widget);

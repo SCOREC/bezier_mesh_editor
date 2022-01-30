@@ -163,6 +163,7 @@ void ApfMesh::createAllNodes()
         }
         apfMesh->end(it);
     }
+    qInfo() << "total number of nodes created " << this->getNumNodes();
 }
 
 void ApfMesh::createAllEdges()
@@ -214,7 +215,7 @@ void ApfMesh::createAllEdges()
             }
     }
     apfMesh->end(it);
-
+    qInfo() << "total number of edges created " << this->getNumEdges();
 }
 
 void ApfMesh::createNodeIds()

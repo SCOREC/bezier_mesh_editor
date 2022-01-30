@@ -30,6 +30,8 @@ public:
     virtual void addEdge(Edge* e) {edges.push_back(e);}
     virtual QList<Node*>& getAllNodes();
     virtual QList<Edge*>& getAllEdges();
+    int getNumNodes();
+    int getNumEdges();
 
 private:
     QList<Node*> nodes;

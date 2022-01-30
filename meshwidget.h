@@ -12,7 +12,7 @@ class MeshWidget : public QGraphicsView
 {
     Q_OBJECT
 public:
-    MeshWidget(MeshWrapper* m, QWidget *parent = nullptr);
+    MeshWidget(MeshWrapper* m, qreal psize = 1., qreal lwidth = 1., QWidget *parent = nullptr);
 
     void itemMoved();
 
@@ -34,6 +34,8 @@ protected:
 private:
 
     MeshWrapper* mesh;
+    qreal pointSize;
+    qreal lineWidth;
 };
 
 #endif // MESHWIDGET_H

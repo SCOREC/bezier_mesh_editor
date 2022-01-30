@@ -70,6 +70,8 @@ public:
 
     void adjust();
 
+    void setWidth(qreal w) { lineWidth = w; }
+
     // enum { Type = UserType + 2 };
     // int type() const override { return Type; }
 
@@ -84,7 +86,7 @@ private:
 
     QPointF sourcePoint;
     QPointF destPoint;
-    qreal arrowSize = 10;
+    qreal lineWidth;
 };
 //! [0]
 

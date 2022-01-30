@@ -17,3 +17,13 @@ QList<Edge*>& MeshWrapper::getAllEdges()
     createAllEdges();
     return edges;
 }
+
+int MeshWrapper::getNumNodes()
+{
+    return nodes.size();
+}
+
+int MeshWrapper::getNumEdges()
+{
+    return edges.size();
+}

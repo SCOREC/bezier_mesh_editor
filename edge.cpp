@@ -53,6 +53,10 @@
 
 #include <QPainter>
 #include <QtMath>
+#include <QDebug>
+
+
+static int cnt = 0;
 
 //! [0]
 Edge::Edge(EntPtr e,
@@ -82,23 +86,23 @@ Node *Edge::destNode() const
 //! [2]
 void Edge::adjust()
 {
-    // instead of comming up with 2 pionts here, you come up with a list of point coordinates in the followin order
-    // v0 n0 n1 n2 ... v1
     if (!source || !dest)
         return;
 
+    qreal ps = source->getSize();
     QLineF line(mapFromItem(source, 0, 0), mapFromItem(dest, 0, 0));
     qreal length = line.length();
 
     prepareGeometryChange();
 
-    if (length > qreal(20.)) {
-        QPointF edgeOffset((line.dx() * 10) / length, (line.dy() * 10) / length);
+    if (length > qreal(2*ps)) {
+        QPointF edgeOffset((line.dx() * ps) / length, (line.dy() * ps) / length);
         sourcePoint = line.p1()  + edgeOffset;
         destPoint = line.p2() - edgeOffset;
     } else {
         sourcePoint = destPoint = line.p1();
     }
+    cnt++;
 }
 //! [2]
 
@@ -108,8 +112,9 @@ QRectF Edge::boundingRect() const
     if (!source || !dest)
         return QRectF();
 
-    qreal penWidth = 1;
-    qreal extra = (penWidth + arrowSize) / 2.0;
+    qreal ps = source->getSize();
+    qreal penWidth = lineWidth;
+    qreal extra = (penWidth + ps) / 2.0;
 
     return QRectF(sourcePoint, QSizeF(destPoint.x() - sourcePoint.x(),
                                       destPoint.y() - sourcePoint.y()))
@@ -131,25 +136,26 @@ void Edge::paint(QPainter *painter, const QStyleOptionGraphicsItem *, QWidget *)
 
 //! [5]
     // Draw the line itself
-    painter->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
+    painter->setPen(QPen(Qt::black, lineWidth, Qt::SolidLine, Qt::RoundCap, Qt::RoundJoin));
     painter->drawLine(line);
 //! [5]
 
 //! [6]
     // Draw the arrows
-    double angle = std::atan2(-line.dy(), line.dx());
+    // qreal arrowSize = source->getSize();
+    // double angle = std::atan2(-line.dy(), line.dx());
 
-    QPointF sourceArrowP1 = sourcePoint + QPointF(sin(angle + M_PI / 3) * arrowSize,
-                                                  cos(angle + M_PI / 3) * arrowSize);
-    QPointF sourceArrowP2 = sourcePoint + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
-                                                  cos(angle + M_PI - M_PI / 3) * arrowSize);
-    QPointF destArrowP1 = destPoint + QPointF(sin(angle - M_PI / 3) * arrowSize,
-                                              cos(angle - M_PI / 3) * arrowSize);
-    QPointF destArrowP2 = destPoint + QPointF(sin(angle - M_PI + M_PI / 3) * arrowSize,
-                                              cos(angle - M_PI + M_PI / 3) * arrowSize);
+    // QPointF sourceArrowP1 = sourcePoint + QPointF(sin(angle + M_PI / 3) * arrowSize,
+                                                  // cos(angle + M_PI / 3) * arrowSize);
+    // QPointF sourceArrowP2 = sourcePoint + QPointF(sin(angle + M_PI - M_PI / 3) * arrowSize,
+                                                  // cos(angle + M_PI - M_PI / 3) * arrowSize);
+    // QPointF destArrowP1 = destPoint + QPointF(sin(angle - M_PI / 3) * arrowSize,
+                                              // cos(angle - M_PI / 3) * arrowSize);
+    // QPointF destArrowP2 = destPoint + QPointF(sin(angle - M_PI + M_PI / 3) * arrowSize,
+                                              // cos(angle - M_PI + M_PI / 3) * arrowSize);
 
-    painter->setBrush(Qt::black);
-    painter->drawPolygon(QPolygonF() << line.p1() << sourceArrowP1 << sourceArrowP2);
-    painter->drawPolygon(QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
+    // painter->setBrush(Qt::black);
+    // painter->drawPolygon(QPolygonF() << line.p1() << sourceArrowP1 << sourceArrowP2);
+    // painter->drawPolygon(QPolygonF() << line.p2() << destArrowP1 << destArrowP2);
 }
 //! [6]
