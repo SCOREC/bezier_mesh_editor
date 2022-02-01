@@ -119,7 +119,7 @@ ApfMesh::ApfMesh(QObject* parent)
 
     apfMesh->acceptChanges();
 
-    apf::changeMeshShape(apfMesh, crv::getBezier(3),true);
+    apf::changeMeshShape(apfMesh, crv::getBezier(4),true);
     // mesh->setPoint(edges[0], 0, apf::Vector3(33.,  20., 0.));
     // mesh->setPoint(edges[0], 1, apf::Vector3(67., -20., 0.));
     apfMesh->acceptChanges();
@@ -218,6 +218,28 @@ void ApfMesh::createAllEdges()
     qInfo() << "total number of edges created " << this->getNumEdges();
 }
 
+void ApfMesh::createAllBezierEdges()
+{
+    apf::MeshEntity* e;
+    apf::MeshIterator* it;
+    it = apfMesh->begin(1);
+    while ((e = apfMesh->iterate(it)))
+    {
+        int non = fieldShape->countNodesOn(apfMesh->getType(e));
+        QList<Node*> ns(non+2);
+        apf::MeshEntity* vs[2];
+        apfMesh->getDownward(e, 0, vs);
+        ns[0] = this->getNodeAt(apf::getNumber(nodeIds, vs[0], 0, 0));
+        ns[non+2-1] = this->getNodeAt(apf::getNumber(nodeIds, vs[1], 0, 0));
+        for (int n=0; n<non; n++) {
+            ns[n+1] = this->getNodeAt(apf::getNumber(nodeIds, e, n, 0));
+        }
+        this->addBezierEdge(new BezierEdge(this, (EntPtr)e, ns, 10));
+    }
+    apfMesh->end(it);
+    qInfo() << "total number of edges created " << this->getNumBezierEdges();
+}
+
 void ApfMesh::createNodeIds()
 {
     nodeIds = apf::createNumbering(apfMesh, "node_id", fieldShape, 1);
@@ -254,6 +276,24 @@ void ApfMesh::setNodePosition(EntPtr e, int n, const QPointF &p)
     apf::Vector3 pt(p.x(), p.y(),0.);
     apfMesh->setPoint(ent, n, pt);
 
+}
+
+void ApfMesh::sampleEdge(EntPtr e, int r, QList<QPointF>& points)
+{
+    QList<qreal> xis;
+    for(int i=0; i<r+1; i++)
+        xis.push_back(2.*i/((qreal)r) - 1.);
+
+    apf::MeshEntity* ent = (apf::MeshEntity*)e;
+    apf::MeshElement* me = apf::createMeshElement(apfMesh, ent);
+
+    for(int i=0; i<r+1; i++)
+    {
+        apf::Vector3 x;
+        apf::mapLocalToGlobal(me, apf::Vector3(xis[i],0.,0.), x);
+        points[i] = QPointF(x[0], -x[1]);
+    }
+    apf::destroyMeshElement(me);
 }
 
 void ApfMesh::write()

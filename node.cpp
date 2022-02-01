@@ -49,6 +49,7 @@
 ****************************************************************************/
 
 #include "edge.h"
+#include "bezieredge.h"
 #include "node.h"
 #include "meshwrapper.h"
 
@@ -82,9 +83,20 @@ void Node::addEdge(Edge *edge)
     edge->adjust();
 }
 
+void Node::addBezierEdge(BezierEdge *bedge)
+{
+    bedgeList << bedge;
+    bedge->adjust();
+}
+
 QList<Edge *> Node::edges() const
 {
     return edgeList;
+}
+
+QList<BezierEdge*> Node::bedges() const
+{
+    return bedgeList;
 }
 
 QRectF Node::boundingRect() const
@@ -176,6 +188,9 @@ QVariant Node::itemChange(GraphicsItemChange change, const QVariant &value)
     case ItemPositionHasChanged:
         for (Edge *edge : qAsConst(edgeList))
             edge->adjust();
+
+        for (BezierEdge *bedge : qAsConst(bedgeList))
+            bedge->adjust();
         //mesh_widget->itemMoved();
         updateMeshNode(value.toPointF()); // pass a qfpoint made out of value
     default:

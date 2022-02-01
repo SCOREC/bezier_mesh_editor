@@ -18,6 +18,12 @@ QList<Edge*>& MeshWrapper::getAllEdges()
     return edges;
 }
 
+QList<BezierEdge*>& MeshWrapper::getAllBezierEdges()
+{
+    createAllBezierEdges();
+    return bedges;
+}
+
 int MeshWrapper::getNumNodes()
 {
     return nodes.size();
@@ -26,4 +32,9 @@ int MeshWrapper::getNumNodes()
 int MeshWrapper::getNumEdges()
 {
     return edges.size();
+}
+
+int MeshWrapper::getNumBezierEdges()
+{
+    return bedges.size();
 }

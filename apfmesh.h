@@ -13,6 +13,7 @@
 #include "meshwrapper.h"
 #include "node.h"
 #include "edge.h"
+#include "bezieredge.h"
 
 
 class ApfMesh : public MeshWrapper
@@ -24,8 +25,10 @@ public:
     ~ApfMesh();
     virtual void createAllNodes();
     virtual void createAllEdges();
+    virtual void createAllBezierEdges();
     virtual QPointF getNodePosition(EntPtr e, int n);
     virtual void setNodePosition(EntPtr e, int n, const QPointF& p);
+    virtual void sampleEdge(EntPtr e, int r, QList<QPointF>& points);
     virtual void write();
 
 private:

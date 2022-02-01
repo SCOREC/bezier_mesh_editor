@@ -61,6 +61,7 @@
 
 
 class Edge;
+class BezierEdge;
 // class GraphWidget;
 // class MeshWidget;
 
@@ -74,7 +75,9 @@ public:
          int d);
 
     void addEdge(Edge *edge);
+    void addBezierEdge(BezierEdge *bedge);
     QList<Edge *> edges() const;
+    QList<BezierEdge*> bedges() const;
 
     enum { Type = UserType + 1 };
     int type() const override { return Type; }
@@ -98,6 +101,7 @@ protected:
 
 private:
     QList<Edge *> edgeList;
+    QList<BezierEdge *> bedgeList;
     QPointF newPos;
     MeshWrapper *mesh;
     EntPtr ent;

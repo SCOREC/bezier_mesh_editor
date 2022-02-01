@@ -3,6 +3,7 @@
 
 #include "meshwidget.h"
 #include "edge.h"
+#include "bezieredge.h"
 #include "node.h"
 
 
@@ -25,6 +26,8 @@ MeshWidget::MeshWidget(MeshWrapper* m, qreal psize, qreal lwidth, QWidget* paren
     QList<Node*> allNodes = mesh->getAllNodes();
     qInfo() << "calling getAllEdges";
     QList<Edge*> allEdges = mesh->getAllEdges();
+    qInfo() << "calling getAllBezierEdges";
+    QList<BezierEdge*> allBezierEdges = mesh->getAllBezierEdges();
     qInfo() << "adding nodes and edges to the scene";
     int cnt = 0;
     for(auto n : allNodes)
@@ -43,6 +46,16 @@ MeshWidget::MeshWidget(MeshWrapper* m, qreal psize, qreal lwidth, QWidget* paren
         e->adjust();
         scene->addItem(e);
     }
+    for(auto e : allBezierEdges)
+    {
+        // set the geometric properites of the edges (e.g., width, etc)
+        e->setWidth(lineWidth);
+        // the follwoing is needed here since when nodes are created geometric properies
+        // of the nodes (e.g., raduis) are not set
+        e->adjust();
+        scene->addItem(e);
+    }
+
 }
 
 
