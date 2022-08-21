@@ -16,3 +16,10 @@ The following pictures show how this works in actions
 ![bmesh_editor_02](https://user-images.githubusercontent.com/1325140/185806730-71de4b24-19ec-4ede-a947-65a4cc16b9bf.png)
 
 ![bmesh_editor_03](https://user-images.githubusercontent.com/1325140/185806736-c399360c-affd-4519-86b5-9e451b8b9d19.png)
+
+
+# Future Developments
+
+* Generalization to 3D
+* More functionality (e.g. show invalid elements)
+* ...
