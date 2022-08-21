@@ -15,7 +15,7 @@ MeshWidget::MeshWidget(MeshWrapper* m, qreal psize, qreal lwidth, QWidget* paren
     scene->setSceneRect(-200, -200, 400, 400);
     setScene(scene);
     setCacheMode(CacheBackground);
-    setViewportUpdateMode(BoundingRectViewportUpdate);
+    setViewportUpdateMode(FullViewportUpdate);
     setRenderHint(QPainter::Antialiasing);
     setTransformationAnchor(AnchorUnderMouse);
     scale(qreal(0.8), qreal(0.8));
